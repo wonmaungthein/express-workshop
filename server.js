@@ -1,25 +1,39 @@
+
+
+
 const express = require('express');
 const app = express();
+const formidable = require('express-formidable');
+const fs = require('fs');
 
-app.get("/", function (req, res) {
-    res.send("HELLO WORLD!");
+
+app.use(express.static("public"));
+app.use(formidable());
+
+app.post("/create-post", function (req, res) {
+    console.log(req.fields);
+
+    const filePath = __dirname + '/data/posts.json';
+    const postsContent = fs.readFile(filePath);
+    const posts = JSON.parse(postsContent);
+    const timestamp = Date.now();
+    posts[timestamp] = req.fields.blogpost;
+    console.log(posts);
+
+    fs.writeFileSync(filePath, JSON.stringify(posts));
+
+    res.send(200,posts);
 });
 
-app.get("/myname", function (req, res) {
-    res.send("My Name Is Won Maung Thein");
+
+app.get('/get-posts', function (req, res) {
+    res.sendfile(__dirname + "/data/posts.json");
 });
 
-app.get("/node", function (req, res) {
-    res.send("This is the exercise of studying NODE. THIS IS AWESOME PROGRAM");
+app.listen(process.env.PORT || 3000, function () {
+  console.log("Server is listening on port 3000. Ready to accept requests!");
 });
-
-app.get("/girls", function (req, res) {
-    res.send("<h1>I have a lot of friends they are girls.</h1> <h2> Some of them are really kind</h2>");
-
-});
-
-
 
 app.listen(3000, function () {
-    console.log("Server is up")
+    console.log("Server is up running")
 });
